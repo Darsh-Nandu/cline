@@ -244,6 +244,7 @@ async function loadConfiguredMcpTools(options: {
 			const message = error instanceof Error ? error.message : String(error);
 			options.logger?.log(
 				`[mcp] Failed to load MCP settings, skipping settings-backed MCP tools: ${message}`,
+				{ severity: "warn" },
 			);
 		}
 	}
@@ -299,6 +300,7 @@ async function loadConfiguredMcpTools(options: {
 					: String(result.reason);
 			options.logger?.log(
 				`[mcp] Failed to load tools from MCP server "${enabled[i].name}", skipping: ${message}`,
+				{ severity: "warn" },
 			);
 		}
 	}

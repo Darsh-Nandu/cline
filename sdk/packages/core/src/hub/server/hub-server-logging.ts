@@ -1,3 +1,5 @@
+import type { BasicLogger } from "@cline/shared";
+
 function serializeLogValue(value: unknown): unknown {
 	if (value instanceof Error) {
 		return {
@@ -66,4 +68,24 @@ export function logHubBoundaryError(message: string, error: unknown): void {
 	const details =
 		error instanceof Error ? error.stack || error.message : String(error);
 	logHubMessage("error", message, { error: details });
+}
+
+/**
+ * Routes session-runtime logs (MCP servers skipped at startup, plugin
+ * failures, team persistence errors) into the hub's structured log so they
+ * land in `hub-daemon.log`. Without a logger the runtime drops them silently.
+ */
+export function createHubRuntimeLogger(): BasicLogger {
+	return {
+		debug: (message, metadata) => logHubMessage("debug", message, metadata),
+		log: (message, metadata) => {
+			const { severity, ...context } = metadata ?? {};
+			logHubMessage(
+				severity === "error" || severity === "warn" ? severity : "info",
+				message,
+				context,
+			);
+		},
+		error: (message, metadata) => logHubMessage("error", message, metadata),
+	};
 }

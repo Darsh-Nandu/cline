@@ -22,6 +22,7 @@ import {
 	resolveSharedHubOwnerContext,
 } from "../discovery/workspace";
 import { startHubWebSocketServer } from "../server";
+import { createHubRuntimeLogger } from "../server/hub-server-logging";
 import { describeAddressInUse } from "./bind-diagnostics";
 import {
 	createHubDaemonShutdownCoordinator,
@@ -167,6 +168,7 @@ async function main(): Promise<void> {
 	});
 
 	const daemonTelemetry = createHubDaemonTelemetry();
+	const runtimeLogger = createHubRuntimeLogger();
 	const formatError = (error: unknown): string =>
 		error instanceof Error ? error.stack || error.message : String(error);
 	let shutdownCoordinator:
@@ -274,8 +276,10 @@ async function main(): Promise<void> {
 					? resolveProductionHubOwnerContext()
 					: resolveSharedHubOwnerContext(),
 			telemetry: daemonTelemetry.telemetry,
+			logger: runtimeLogger,
 			runtimeHandlers: createLocalHubScheduleRuntimeHandlers({
 				telemetry: daemonTelemetry.telemetry,
+				logger: runtimeLogger,
 			}),
 			cronOptions: { workspaceRoot: options.cwd },
 		});

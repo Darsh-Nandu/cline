@@ -183,12 +183,14 @@ describe("hub daemon entry", () => {
 				pathname: "/hub",
 				owner: expect.objectContaining({ ownerId: "production" }),
 				telemetry: mockDaemonTelemetryService,
+				logger: expect.objectContaining({ log: expect.any(Function) }),
 				cronOptions: { workspaceRoot: cwd },
 			}),
 		);
 		expect(mockCreateLocalHubScheduleRuntimeHandlers).toHaveBeenCalledOnce();
 		expect(mockCreateLocalHubScheduleRuntimeHandlers).toHaveBeenCalledWith({
 			telemetry: mockDaemonTelemetryService,
+			logger: expect.objectContaining({ log: expect.any(Function) }),
 		});
 		expect(mockReconnectDaemonConnectors).toHaveBeenCalledOnce();
 	});
